@@ -21,14 +21,16 @@ Public Sub Game()
 Call CreateField
 Call InitalizeSnake
 Do While (Not GameOver)
-    'DoEvents
+    If Worksheets("Settings").Cells(11, 3) = True Then
+        DoEvents
+    End If
     Call CheckKeys
     Call Move
     Call IsGameOver
     Call RandomDrop
     If (Not GameOver) Then
         Call DrawSnake
-        Sleep 100
+        Sleep Worksheets("Settings").Cells(12, 3)
     End If
 Loop
 End Sub
@@ -44,7 +46,7 @@ Do While (Not GameOver)
     Call RandomDrop
     If (Not GameOver) Then
         Call DrawSnake
-        Sleep 100
+        Sleep Worksheets("Settings").Cells(12, 3)
     End If
 Loop
 End Sub
@@ -65,7 +67,12 @@ Private Sub WhatWouldTheKIDo()
 End Sub
 
 Private Sub CrashCheck()
+    On Error Resume Next
     If Right = True Then
+        If (SnakeBody(1, 1) + 1 = Width + 2) Then
+            Call UpButton
+            Call CrashCheck
+        End If
         For i = LBound(SnakeBody) + 1 To UBound(SnakeBody) - 1
             If SnakeBody(i, 1) = 0 Then
                  Exit For
@@ -76,6 +83,10 @@ Private Sub CrashCheck()
             End If
         Next i
     ElseIf Left = True Then
+        If (SnakeBody(1, 1) - 1 = 1) Then
+            Call DownButton
+            Call CrashCheck
+        End If
         For i = LBound(SnakeBody) + 1 To UBound(SnakeBody) - 1
             If SnakeBody(i, 1) = 0 Then
                  Exit For
@@ -86,6 +97,10 @@ Private Sub CrashCheck()
             End If
         Next i
     ElseIf Up = True Then
+        If (SnakeBody(1, 2) - 1 = 1) Then
+            Call LeftButton
+            Call CrashCheck
+        End If
         For i = LBound(SnakeBody) + 1 To UBound(SnakeBody) - 1
             If SnakeBody(i, 1) = 0 Then
                  Exit For
@@ -96,6 +111,10 @@ Private Sub CrashCheck()
             End If
         Next i
     Else
+        If (SnakeBody(1, 2) + 1 = Height + 2) Then
+            Call RightButton
+            Call CrashCheck
+        End If
         For i = LBound(SnakeBody) + 1 To UBound(SnakeBody) - 1
             If SnakeBody(i, 1) = 0 Then
                  Exit For
@@ -106,13 +125,12 @@ Private Sub CrashCheck()
             End If
         Next i
     End If
-    
 End Sub
 
 Private Sub CreateField()
     LastScore = Worksheets("Settings").Cells(9, 6)
     HighScore = Worksheets("Settings").Cells(10, 6)
-    Cells.Clear
+    Worksheets("Game").Cells.Clear
     Height = Worksheets("Settings").Cells(9, 3)
     Width = Worksheets("Settings").Cells(10, 3)
     ActiveWindow.DisplayGridlines = False
@@ -127,28 +145,28 @@ Private Sub CreateField()
     Columns("A:" & ColLetter(Width + 2)).ColumnWidth = 1.5
     Rows("1:" & Height + 2).RowHeight = 10.5
     
-    With Range("A1:" & ColLetter(Width + 2) & "1").Interior
+    With Worksheets("Game").Range("A1:" & ColLetter(Width + 2) & "1").Interior
         .Pattern = xlSolid
         .PatternColorIndex = xlAutomatic
         .ThemeColor = xlThemeColorLight1
         .TintAndShade = 0
         .PatternTintAndShade = 0
     End With
-    With Range("A1:A" & Height + 2).Interior
+    With Worksheets("Game").Range("A1:A" & Height + 2).Interior
         .Pattern = xlSolid
         .PatternColorIndex = xlAutomatic
         .ThemeColor = xlThemeColorLight1
         .TintAndShade = 0
         .PatternTintAndShade = 0
     End With
-    With Range("A" & Height + 2 & ":" & ColLetter(Width + 2) & Height + 2).Interior
+    With Worksheets("Game").Range("A" & Height + 2 & ":" & ColLetter(Width + 2) & Height + 2).Interior
         .Pattern = xlSolid
         .PatternColorIndex = xlAutomatic
         .ThemeColor = xlThemeColorLight1
         .TintAndShade = 0
         .PatternTintAndShade = 0
     End With
-    With Range(ColLetter(Width + 2) & "1:" & ColLetter(Width + 2) & Height + 2).Interior
+    With Worksheets("Game").Range(ColLetter(Width + 2) & "1:" & ColLetter(Width + 2) & Height + 2).Interior
         .Pattern = xlSolid
         .PatternColorIndex = xlAutomatic
         .ThemeColor = xlThemeColorLight1
@@ -175,7 +193,7 @@ Private Sub RandomDrop()
             Next i
         Loop
         DropSpawned = True
-        With Range(ColLetter(DropX) & DropY).Interior
+        With Worksheets("Game").Range(ColLetter(DropX) & DropY).Interior
             .Pattern = xlSolid
             .PatternColorIndex = xlAutomatic
             .ThemeColor = xlThemeColorDark2
@@ -187,13 +205,21 @@ End Sub
 
 Private Sub CheckKeys()
 If GetAsyncKeyState(vbKeyUp) Then
-    Call UpButton
+    If Worksheets("Settings").Cells(11, 3) = False Then
+        Call UpButton
+    End If
 ElseIf GetAsyncKeyState(vbKeyRight) Then
-    Call RightButton
+    If Worksheets("Settings").Cells(11, 3) = False Then
+        Call RightButton
+    End If
 ElseIf GetAsyncKeyState(vbKeyLeft) Then
-    Call LeftButton
+    If Worksheets("Settings").Cells(11, 3) = False Then
+        Call LeftButton
+    End If
 ElseIf GetAsyncKeyState(vbKeyDown) Then
-    Call DownButton
+    If Worksheets("Settings").Cells(11, 3) = False Then
+        Call DownButton
+    End If
 End If
 End Sub
 
@@ -202,13 +228,39 @@ Private Sub DrawSnake()
         If SnakeBody(i, 1) = 0 Then
             Exit For
         End If
-        With Range(ColLetter(SnakeBody(i, 1)) & SnakeBody(i, 2)).Interior
-            .Pattern = xlSolid
-            .PatternColorIndex = xlAutomatic
-            .Color = 5296274
-            .TintAndShade = 0
-            .PatternTintAndShade = 0
-        End With
+        If Worksheets("Settings").Cells(13, 3) = "Purple" Then
+            With Worksheets("Game").Range(ColLetter(SnakeBody(i, 1)) & SnakeBody(i, 2)).Interior
+                .Pattern = xlSolid
+                .PatternColorIndex = xlAutomatic
+                .Color = 10498160
+                .TintAndShade = 0
+                .PatternTintAndShade = 0
+            End With
+        ElseIf Worksheets("Settings").Cells(13, 3) = "Green" Then
+            With Worksheets("Game").Range(ColLetter(SnakeBody(i, 1)) & SnakeBody(i, 2)).Interior
+                .Pattern = xlSolid
+                .PatternColorIndex = xlAutomatic
+                .Color = 5296274
+                .TintAndShade = 0
+                .PatternTintAndShade = 0
+            End With
+        ElseIf Worksheets("Settings").Cells(13, 3) = "Blue" Then
+            With Worksheets("Game").Range(ColLetter(SnakeBody(i, 1)) & SnakeBody(i, 2)).Interior
+                .Pattern = xlSolid
+                .PatternColorIndex = xlAutomatic
+                .Color = 15773696
+                .TintAndShade = 0
+                .PatternTintAndShade = 0
+            End With
+        ElseIf Worksheets("Settings").Cells(13, 3) = "Red" Then
+            With Worksheets("Game").Range(ColLetter(SnakeBody(i, 1)) & SnakeBody(i, 2)).Interior
+                .Pattern = xlSolid
+                .PatternColorIndex = xlAutomatic
+                .Color = 192
+                .TintAndShade = 0
+                .PatternTintAndShade = 0
+            End With
+        End If
     Next i
 End Sub
 Private Sub Move()
@@ -262,7 +314,7 @@ For i = LBound(TempSnake) To UBound(TempSnake)
             Exit Sub
             Else
                 If RemoveEnd = True Then
-                    With Cells(SnakeBody(i - 1, 2), SnakeBody(i - 1, 1)).Interior
+                    With Worksheets("Game").Cells(SnakeBody(i - 1, 2), SnakeBody(i - 1, 1)).Interior
                         .Pattern = xlNone
                         .TintAndShade = 0
                         .PatternTintAndShade = 0
@@ -301,22 +353,22 @@ For i = LBound(SnakeBody) + 1 To UBound(SnakeBody)
     TempSnake(i, 2) = 0
 Next i
 
-SnakeBody(1, 1) = 20
-SnakeBody(1, 2) = 14
-SnakeBody(2, 1) = 19
-SnakeBody(2, 2) = 14
-SnakeBody(3, 1) = 18
-SnakeBody(3, 2) = 14
-SnakeBody(4, 1) = 17
-SnakeBody(4, 2) = 14
-SnakeBody(5, 1) = 16
-SnakeBody(5, 2) = 14
-SnakeBody(6, 1) = 15
-SnakeBody(6, 2) = 14
+SnakeBody(1, 1) = Round(Width / 2, 0) + 3
+SnakeBody(1, 2) = Round(Height / 2, 0)
+SnakeBody(2, 1) = Round(Width / 2, 0) + 2
+SnakeBody(2, 2) = Round(Height / 2, 0)
+SnakeBody(3, 1) = Round(Width / 2, 0) + 1
+SnakeBody(3, 2) = Round(Height / 2, 0)
+SnakeBody(4, 1) = Round(Width / 2, 0)
+SnakeBody(4, 2) = Round(Height / 2, 0)
+SnakeBody(5, 1) = Round(Width / 2, 0) - 1
+SnakeBody(5, 2) = Round(Height / 2, 0)
+SnakeBody(6, 1) = Round(Width / 2, 0) - 2
+SnakeBody(6, 2) = Round(Height / 2, 0)
 Call DrawSnake
 End Sub
 
-Private Sub UpButton()
+Public Sub UpButton()
     If Down <> True Then
         Up = True
         Down = False
@@ -324,7 +376,7 @@ Private Sub UpButton()
         Left = False
     End If
 End Sub
-Private Sub RightButton()
+Public Sub RightButton()
     If Left <> True Then
         Up = False
         Down = False
@@ -332,7 +384,7 @@ Private Sub RightButton()
         Left = False
     End If
 End Sub
-Private Sub DownButton()
+Public Sub DownButton()
     If Up <> True Then
         Up = False
         Down = True
@@ -340,7 +392,7 @@ Private Sub DownButton()
         Left = False
     End If
 End Sub
-Private Sub LeftButton()
+Public Sub LeftButton()
     If Right <> True Then
         Up = False
         Down = False
@@ -348,16 +400,11 @@ Private Sub LeftButton()
         Left = True
     End If
 End Sub
-Function ColLetter(iCol As Integer) As String
-   Dim iAlpha As Integer
-   Dim iRemainder As Integer
-   iAlpha = Int(iCol / 27)
-   iRemainder = iCol - (iAlpha * 26)
-   If iAlpha > 0 Then
-      ColLetter = Chr(iAlpha + 64)
-   End If
-   If iRemainder > 0 Then
-      ColLetter = ColLetter & Chr(iRemainder + 64)
-   End If
+Function ColLetter(lngCol As Integer) As String
+    Dim vArr
+    vArr = Split(Cells(1, lngCol).Address(True, False), "$")
+    ColLetter = vArr(0)
 End Function
+
+
 
