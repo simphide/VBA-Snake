@@ -9,6 +9,7 @@ Dim Up As Boolean
 Dim Down As Boolean
 Dim DropSpawned As Boolean
 Dim RemoveEnd As Boolean
+Dim ClearSnake As Boolean
 
 Dim DropX As Integer
 Dim DropY As Integer
@@ -19,12 +20,17 @@ Dim TempSnake(1 To 100, 1 To 2) As Integer
 
 Public Sub Game()
 Call CreateField
+If Worksheets("Settings").Cells(14, 3) = True Then
+    Call StartAnim
+End If
 Call InitalizeSnake
 Do While (Not GameOver)
     If Worksheets("Settings").Cells(11, 3) = True Then
         DoEvents
     End If
-    Call CheckKeys
+    If Worksheets("Settings").Cells(11, 3) = False Then
+        Call CheckKeys
+    End If
     Call Move
     Call IsGameOver
     Call RandomDrop
@@ -37,6 +43,9 @@ End Sub
 
 Public Sub KIGame()
 Call CreateField
+If Worksheets("Settings").Cells(14, 3) = True Then
+    Call StartAnim
+End If
 Call InitalizeSnake
 Do While (Not GameOver)
     DoEvents
@@ -76,7 +85,7 @@ Private Sub CrashCheck()
         For i = LBound(SnakeBody) + 1 To UBound(SnakeBody) - 1
             If SnakeBody(i, 1) = 0 Then
                  Exit For
-             End If
+            End If
             If (SnakeBody(i, 1) = SnakeBody(1, 1) + 1 And SnakeBody(i, 2) = SnakeBody(1, 2)) Then
                 Call UpButton
                 Call CrashCheck
@@ -205,21 +214,13 @@ End Sub
 
 Private Sub CheckKeys()
 If GetAsyncKeyState(vbKeyUp) Then
-    If Worksheets("Settings").Cells(11, 3) = False Then
         Call UpButton
-    End If
 ElseIf GetAsyncKeyState(vbKeyRight) Then
-    If Worksheets("Settings").Cells(11, 3) = False Then
         Call RightButton
-    End If
 ElseIf GetAsyncKeyState(vbKeyLeft) Then
-    If Worksheets("Settings").Cells(11, 3) = False Then
         Call LeftButton
-    End If
 ElseIf GetAsyncKeyState(vbKeyDown) Then
-    If Worksheets("Settings").Cells(11, 3) = False Then
         Call DownButton
-    End If
 End If
 End Sub
 
@@ -228,7 +229,13 @@ Private Sub DrawSnake()
         If SnakeBody(i, 1) = 0 Then
             Exit For
         End If
-        If Worksheets("Settings").Cells(13, 3) = "Purple" Then
+        If ClearSnake = True Then
+            With Worksheets("Game").Range(ColLetter(SnakeBody(i, 1)) & SnakeBody(i, 2)).Interior
+                .Pattern = xlNone
+                .TintAndShade = 0
+                .PatternTintAndShade = 0
+            End With
+        ElseIf Worksheets("Settings").Cells(13, 3) = "Purple" Then
             With Worksheets("Game").Range(ColLetter(SnakeBody(i, 1)) & SnakeBody(i, 2)).Interior
                 .Pattern = xlSolid
                 .PatternColorIndex = xlAutomatic
@@ -399,6 +406,29 @@ Public Sub LeftButton()
         Right = False
         Left = True
     End If
+End Sub
+
+Private Sub StartAnim()
+    For i = 0 To 20
+        ClearSnake = False
+        SnakeBody(1, 1) = CInt((Width - 1) * Rnd() + 2)
+        SnakeBody(1, 2) = CInt((Height - 1) * Rnd() + 2)
+        SnakeBody(2, 1) = CInt((Width - 1) * Rnd() + 2)
+        SnakeBody(2, 2) = CInt((Height - 1) * Rnd() + 2)
+        SnakeBody(3, 1) = CInt((Width - 1) * Rnd() + 2)
+        SnakeBody(3, 2) = CInt((Height - 1) * Rnd() + 2)
+        SnakeBody(4, 1) = CInt((Width - 1) * Rnd() + 2)
+        SnakeBody(4, 2) = CInt((Height - 1) * Rnd() + 2)
+        SnakeBody(5, 1) = CInt((Width - 1) * Rnd() + 2)
+        SnakeBody(5, 2) = CInt((Height - 1) * Rnd() + 2)
+        SnakeBody(6, 1) = CInt((Width - 1) * Rnd() + 2)
+        SnakeBody(6, 2) = CInt((Height - 1) * Rnd() + 2)
+        Call DrawSnake
+        Sleep 50
+        ClearSnake = True
+        Call DrawSnake
+    Next i
+    ClearSnake = False
 End Sub
 Function ColLetter(lngCol As Integer) As String
     Dim vArr
