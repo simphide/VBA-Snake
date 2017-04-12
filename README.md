@@ -1,2 +1,2 @@
 # VBA-Snake
-Small Snake VBA Macro
+Simple Snake VBA Macro
