@@ -409,6 +409,12 @@ Public Sub LeftButton()
 End Sub
 
 Private Sub StartAnim()
+    For i = LBound(SnakeBody) + 1 To UBound(SnakeBody)
+        SnakeBody(i, 1) = 0
+        SnakeBody(i, 2) = 0
+        TempSnake(i, 1) = 0
+        TempSnake(i, 2) = 0
+    Next i
     For i = 0 To 20
         ClearSnake = False
         SnakeBody(1, 1) = CInt((Width - 1) * Rnd() + 2)
